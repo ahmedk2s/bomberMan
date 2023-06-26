@@ -160,6 +160,31 @@ document.addEventListener("keydown", function (event) {
   player.style.top = newPositionY + "px";
 });
 
+//-------------------------- CREATION DES MECHANTS--------------------------
+
+
+let enemyList = []; // Liste pour stocker les ennemis
+
+// Fonction pour générer une position aléatoire valide pour un ennemi
+function generateRandomEnemyPosition() {
+  let x, y; // Coordonnées x et y de la position générée
+
+  do {
+    x = Math.floor(Math.random() * gridSize); // Génère une coordonnée x aléatoire
+    y = Math.floor(Math.random() * gridSize); // Génère une coordonnée y aléatoire
+  } while (gameMap[y][x] !== 0); // Répète tant que la position n'est pas vide
+
+  return { x, y }; // Retourne les coordonnées générées
+}
+for (let i = 0; i < 5; i++) {
+  let enemy = document.createElement("div");
+  let {x, y} = generateRandomEnemyPosition();
+  enemy.style.left = x * cellSize + "px";
+  enemy.style.top = y * cellSize + "px";
+  enemy.classList.add("enemy");
+  gameContainer.appendChild(enemy);
+  
+}
 
 
 
