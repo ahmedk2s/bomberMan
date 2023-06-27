@@ -176,15 +176,110 @@ function generateRandomEnemyPosition() {
 
   return { x, y }; // Retourne les coordonnées générées
 }
+// Création des ennemis
 for (let i = 0; i < 5; i++) {
   let enemy = document.createElement("div");
-  let {x, y} = generateRandomEnemyPosition();
-  enemy.style.left = x * cellSize + "px";
-  enemy.style.top = y * cellSize + "px";
+  enemy.id = "enemy" + String(i);
+
+  let { x, y } = generateRandomEnemyPosition();
+
+  gameMap[y][x] = 1;
+  enemy.enemyX = x;
+  enemy.enemyY = y;
   enemy.classList.add("enemy");
+  enemy.style.left = String(x * cellSize) + "px";
+  enemy.style.top = String(y * cellSize) + "px";
   gameContainer.appendChild(enemy);
-  
+
+  enemyList.push(enemy);
 }
+function isEnemyAtPosition(x, y) {
+  for (let i = 0; i < enemyList.length; i++) {
+    const enemy = enemyList[i];
+    if (enemy.enemyX === x && enemy.enemyY === y) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isWallAtPosition(x, y) {
+  return gameMap[y][x] === 1;
+}
+
+function isPositionValid(x, y) {
+  return (
+    x >= 0 &&
+    x < gridSize &&
+    y >= 0 &&
+    y < gridSize &&
+    !isWallAtPosition(x, y) &&
+    !isEnemyAtPosition(x, y)
+  );
+}
+
+function moveEnemy(enemy) {
+  const enemyX = enemy.enemyX;
+  const enemyY = enemy.enemyY;
+
+  let direction;
+
+  let random = random100();
+
+  if (random < 25) {
+    direction = "left";
+  } else if (random >= 25 && random < 50) {
+    direction = "right";
+  } else if (random >= 50 && random < 75) {
+    direction = "up";
+  } else {
+    direction = "down";
+  }
+
+  let newEnemyX = enemyX;
+  let newEnemyY = enemyY;
+
+  if (direction === "left") {
+    newEnemyX = enemyX - 1;
+  } else if (direction === "right") {
+    newEnemyX = enemyX + 1;
+  } else if (direction === "up") {
+    newEnemyY = enemyY - 1;
+  } else if (direction === "down") {
+    newEnemyY = enemyY + 1;
+  }
+
+  // Vérifier si la nouvelle position est valide et libre
+  if (isPositionValid(newEnemyX, newEnemyY)) {
+    // Mettre à jour les coordonnées de l'ennemi dans le tableau gameMap
+    gameMap[enemyY][enemyX] = 0;
+    gameMap[newEnemyY][newEnemyX] = 1;
+
+    // Mettre à jour les coordonnées de l'ennemi dans l'objet enemy
+    enemy.enemyX = newEnemyX;
+    enemy.enemyY = newEnemyY;
+
+    // Mettre à jour la position de l'ennemi sur l'écran
+    enemy.style.left = String(newEnemyX * cellSize) + "px";
+    enemy.style.top = String(newEnemyY * cellSize) + "px";
+  }
+}
+
+function random100() {
+  return Math.floor(Math.random() * 100);
+}
+
+function moveAllEnemies() {
+  for (let i = 0; i < enemyList.length; i++) {
+    moveEnemy(enemyList[i]);
+  }
+
+  // Appeler moveAllEnemies à nouveau après un délai de 500 millisecondes
+  setTimeout(moveAllEnemies, 500);
+}
+
+// Appeler moveAllEnemies pour démarrer le mouvement continu des ennemis
+moveAllEnemies();
 
 
 
