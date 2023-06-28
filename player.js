@@ -272,11 +272,34 @@ function random100() {
 function moveAllEnemies() {
   for (let i = 0; i < enemyList.length; i++) {
     moveEnemy(enemyList[i]);
+    checkCollision(player, enemyList[i]);
   }
 
   // Appeler moveAllEnemies à nouveau après un délai de 500 millisecondes
   setTimeout(moveAllEnemies, 500);
 }
+function checkCollision(player, enemy) {
+  const playerRect = player.getBoundingClientRect();
+  const enemyRect = enemy.getBoundingClientRect();
+
+  if (
+    playerRect.x < enemyRect.x + enemyRect.width &&
+    playerRect.x + playerRect.width > enemyRect.x &&
+    playerRect.y < enemyRect.y + enemyRect.height &&
+    playerRect.y + playerRect.height > enemyRect.y
+  ) {
+    // Collision détectée, le joueur est touché par un ennemi
+
+    // Mettez ici la logique pour la défaite du joueur, par exemple :
+    alert("Vous avez perdu !");
+    
+    // Réinitialiser la position du joueur
+    player.style.left = "3.3%";
+    player.style.top = "3.3%";
+  }
+}
+
+
 
 // Appeler moveAllEnemies pour démarrer le mouvement continu des ennemis
 moveAllEnemies();
