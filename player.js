@@ -23,21 +23,45 @@ gameContainer.style.height = "800px";
 // Tableau représentant le terrain de jeu
 const gameMap = [];
 
-// Remplir le tableau gameMap avec des valeurs aléatoires
+const indestructibleWalls = [
+  { row: 1, col: 1 }, { row: 1, col: 3 }, { row: 1, col: 5 }, { row: 1, col: 7 }, { row: 1, col: 9 }, { row: 1, col: 11 }, { row: 1, col: 13 },
+  { row: 3, col: 1 }, { row: 3, col: 3 }, { row: 3, col: 5 }, { row: 3, col: 7 }, { row: 3, col: 9 }, { row: 3, col: 11 }, { row: 3, col: 13 },
+  { row: 5, col: 1 }, { row: 5, col: 3 }, { row: 5, col: 5 }, { row: 5, col: 7 }, { row: 5, col: 9 }, { row: 5, col: 11 }, { row: 5, col: 13 },
+  { row: 7, col: 1 }, { row: 7, col: 3 }, { row: 7, col: 5 }, { row: 7, col: 7 }, { row: 7, col: 9 }, { row: 7, col: 11 }, { row: 7, col: 13 },
+  { row: 9, col: 1 }, { row: 9, col: 3 }, { row: 9, col: 5 }, { row: 9, col: 7 }, { row: 9, col: 9 }, { row: 9, col: 11 }, { row: 9, col: 13 },
+  { row: 11, col: 1 }, { row: 11, col: 3 }, { row: 11, col: 5 }, { row: 11, col: 7 }, { row: 11, col: 9 }, { row: 11, col: 11 }, { row: 11, col: 13 },
+  { row: 13, col: 1 }, { row: 13, col: 3 }, { row: 13, col: 5 }, { row: 13, col: 7 }, { row: 13, col: 9 }, { row: 13, col: 11 }, { row: 13, col: 13 }
+  // Ajoutez autant de coordonnées de murs indestructibles que nécessaire
+];
+
+
+
 function generateRandomMap() {
   for (let row = 0; row < gridSize; row++) {
     gameMap.push([]);
     for (let col = 0; col < gridSize; col++) {
-      // Générer une valeur aléatoire (0 ou 1) pour chaque cellule
-      const cellValue = Math.random() < 0.5 ? 0 : 1;
+      let cellValue = 1; // Par défaut, toutes les cellules sont des murs destructibles
+
+      // Vérifiez si les coordonnées correspondent à un mur indestructible
+      const isIndestructible = indestructibleWalls.some(
+        (wall) => wall.row === row && wall.col === col
+      );
+
+      if (!isIndestructible) {
+        // Générer une valeur aléatoire (0 ou 1) pour chaque cellule
+        cellValue = Math.random() < 0.6 ? 0 : 1;
+      }
+
       gameMap[row].push(cellValue);
     }
   }
+
   // Mettre la valeur de la première case à 0 pour éviter un mur
   gameMap[0][0] = 0;
   gameMap[0][1] = 0;
   gameMap[1][0] = 0;
 }
+
 
 // Appeler la fonction pour générer le terrain aléatoire
 generateRandomMap();
@@ -51,31 +75,41 @@ function drawGameMap() {
       const cellY = row * cellSize;
 
       if (cellValue === 1) {
+        // Vérifiez si les coordonnées correspondent à un mur indestructible
+        const isIndestructible = indestructibleWalls.some(
+          (wall) => wall.row === row && wall.col === col
+        );
+
         // Créer un élément div pour représenter un mur
         const wall = document.createElement("div");
-        wall.classList.add("wall");
+        wall.classList.add(isIndestructible ? "indestructible-wall" : "wall");
+
         // Définir les styles de l'élément pour représenter un mur
         wall.style.width = cellSize + "px";
         wall.style.height = cellSize + "px";
         wall.style.left = cellX + "px";
         wall.style.top = cellY + "px";
+
         // Ajouter l'élément au conteneur du jeu
         gameContainer.appendChild(wall);
       } else {
         // Créer un élément div pour représenter le sol
         const ground = document.createElement("div");
         ground.classList.add("ground");
+
         // Définir les styles de l'élément pour représenter le sol
         ground.style.width = cellSize + "px";
         ground.style.height = cellSize + "px";
         ground.style.left = cellX + "px";
         ground.style.top = cellY + "px";
+
         // Ajouter l'élément au conteneur du jeu
         gameContainer.appendChild(ground);
       }
     }
   }
 }
+
 
 // Appeler la fonction pour dessiner le terrain de jeu
 drawGameMap();
@@ -167,15 +201,17 @@ let enemyList = []; // Liste pour stocker les ennemis
 
 // Fonction pour générer une position aléatoire valide pour un ennemi
 function generateRandomEnemyPosition() {
-  let x, y; // Coordonnées x et y de la position générée
+  let x, y;
 
   do {
-    x = Math.floor(Math.random() * gridSize); // Génère une coordonnée x aléatoire
-    y = Math.floor(Math.random() * gridSize); // Génère une coordonnée y aléatoire
-  } while (gameMap[y][x] !== 0); // Répète tant que la position n'est pas vide
+    x = Math.floor(Math.random() * gridSize);
+    y = Math.floor(Math.random() * gridSize);
+  } while (gameMap[y][x] !== 0 || (x === 0 && y === 0) || (x === 0 && y === 1) || (x === 0 && y === 2) || (x === 0 && y === 3) || (x === 0 && y === 4) || (x === 1 && y === 0) || (x === 1 && y === 1) || (x === 1 && y === 2) || (x === 1 && y === 3) || (x === 1 && y === 4) || (x === 2 && y === 0) || (x === 2 && y === 1) || (x === 2 && y === 2) || (x === 2 && y === 3)|| (x === 2 && y === 4) || (x === 3 && y === 0) || (x === 3 && y === 1) || (x === 3 && y === 2) || (x === 3 && y === 3) || (x === 3 && y === 4) || (x === 4 && y === 0) || (x === 4 && y === 1) || (x === 4 && y === 2) || (x === 4 && y === 3) || (x === 4 && y === 4)); // Exclut les positions 
 
-  return { x, y }; // Retourne les coordonnées générées
+  return { x, y };
 }
+
+
 // Création des ennemis
 for (let i = 0; i < 5; i++) {
   let enemy = document.createElement("div");
@@ -298,8 +334,6 @@ function checkCollision(player, enemy) {
     player.style.top = "3.3%";
   }
 }
-
-
 
 // Appeler moveAllEnemies pour démarrer le mouvement continu des ennemis
 moveAllEnemies();
