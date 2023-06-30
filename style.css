@@ -69,6 +69,54 @@
 .enemy:after {
   right: 25%;
 }
+/* Styles pour la bombe */
+.bomb {
+  background-color: black;
+  border-radius: 50%;
+  position: relative;
+  animation: bombAnimation 1s infinite;
+}
+
+@keyframes bombAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+/* Styles pour l'explosion
+.explosion {
+  background-color: red;
+  opacity: 0.5;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  animation-name: explode;
+  animation-duration: 1s;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes explode {
+  0% {
+    opacity: 0.5;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+} */
+
 
 
 

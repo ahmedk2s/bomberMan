@@ -124,6 +124,11 @@ document.addEventListener("keydown", function (event) {
   let newPositionX = player.offsetLeft;
   let newPositionY = player.offsetTop;
 
+    // Vérifier si la touche est la barre d'espace pour placer une bombe
+    if (event.code === "Space") {
+      placeBomb();
+    }
+
   // Vérifier quelle touche du clavier a été pressée
   if (event.code === "ArrowUp") {
     // Incrémenter le compteur de pas du joueur
@@ -337,6 +342,73 @@ function checkCollision(player, enemy) {
 
 // Appeler moveAllEnemies pour démarrer le mouvement continu des ennemis
 moveAllEnemies();
+
+
+// --------------------- CREATION BOMBE -----------------------
+
+let bomb = null;
+
+function placeBomb() {
+  if (bomb !== null) {
+    return; // Il y a déjà une bombe sur le terrain
+  }
+
+  const playerX = Math.floor(player.offsetLeft / cellSize);
+  const playerY = Math.floor(player.offsetTop / cellSize);
+
+  if (isEnemyAtPosition(playerX, playerY)) {
+    return; // Le joueur ne peut pas placer une bombe sur un ennemi
+  }
+
+  // Créer un élément div pour représenter la bombe
+  bomb = document.createElement("div");
+  bomb.classList.add("bomb");
+
+  // Définir les styles de l'élément pour représenter la bombe
+  bomb.style.width = cellSize + "px";
+  bomb.style.height = cellSize + "px";
+  bomb.style.left = playerX * cellSize + "px";
+  bomb.style.top = playerY * cellSize + "px";
+
+  // Ajouter l'élément au conteneur du jeu
+  gameContainer.appendChild(bomb);
+
+  // Lancer la minuterie de l'explosion de la bombe après 2 secondes
+  setTimeout(explodeBomb, 2000);
+}
+function explodeBomb() {
+  const bombX = Math.floor(bomb.offsetLeft / cellSize);
+  const bombY = Math.floor(bomb.offsetTop / cellSize);
+
+  // Supprimer la bombe du DOM
+  bomb.remove();
+  bomb = null;
+
+  // Supprimer les ennemis à proximité de l'explosion
+  for (let i = 0; i < enemyList.length; i++) {
+    const enemy = enemyList[i];
+    const enemyX = enemy.enemyX;
+    const enemyY = enemy.enemyY;
+
+    if (
+      Math.abs(enemyX - bombX) <= 1 &&
+      Math.abs(enemyY - bombY) <= 1
+    ) {
+      // Supprimer l'ennemi du DOM
+      enemy.remove();
+
+      // Retirer l'ennemi de la liste enemyList
+      enemyList.splice(i, 1);
+
+      // Mettre à jour le tableau gameMap pour supprimer l'ennemi
+      gameMap[enemyY][enemyX] = 0;
+
+      // Décrémenter l'index pour compenser la suppression de l'ennemi
+      i--;
+    }
+  }
+}
+
 
 
 
