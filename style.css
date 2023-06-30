@@ -69,7 +69,7 @@
 .enemy:after {
   right: 25%;
 }
-/* Styles pour la bombe */
+
 .bomb {
   background-color: black;
   border-radius: 50%;

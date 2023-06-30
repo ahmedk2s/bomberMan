@@ -49,7 +49,7 @@ function generateRandomMap() {
 
       if (!isIndestructible) {
         // Générer une valeur aléatoire (0 ou 1) pour chaque cellule
-        cellValue = Math.random() < 0.6 ? 0 : 1;
+        cellValue = Math.random() < 0.8 ? 0 : 1;
       }
 
       gameMap[row].push(cellValue);
@@ -66,7 +66,6 @@ function generateRandomMap() {
 // Appeler la fonction pour générer le terrain aléatoire
 generateRandomMap();
 
-// Fonction pour dessiner le terrain de jeu
 function drawGameMap() {
   for (let row = 0; row < gridSize; row++) {
     for (let col = 0; col < gridSize; col++) {
@@ -75,35 +74,30 @@ function drawGameMap() {
       const cellY = row * cellSize;
 
       if (cellValue === 1) {
-        // Vérifiez si les coordonnées correspondent à un mur indestructible
         const isIndestructible = indestructibleWalls.some(
           (wall) => wall.row === row && wall.col === col
         );
 
-        // Créer un élément div pour représenter un mur
         const wall = document.createElement("div");
         wall.classList.add(isIndestructible ? "indestructible-wall" : "wall");
+        wall.dataset.row = row; // Ajouter l'attribut data-row avec la valeur de la rangée
+        wall.dataset.col = col; // Ajouter l'attribut data-col avec la valeur de la colonne
 
-        // Définir les styles de l'élément pour représenter un mur
         wall.style.width = cellSize + "px";
         wall.style.height = cellSize + "px";
         wall.style.left = cellX + "px";
         wall.style.top = cellY + "px";
 
-        // Ajouter l'élément au conteneur du jeu
         gameContainer.appendChild(wall);
       } else {
-        // Créer un élément div pour représenter le sol
         const ground = document.createElement("div");
         ground.classList.add("ground");
 
-        // Définir les styles de l'élément pour représenter le sol
         ground.style.width = cellSize + "px";
         ground.style.height = cellSize + "px";
         ground.style.left = cellX + "px";
         ground.style.top = cellY + "px";
 
-        // Ajouter l'élément au conteneur du jeu
         gameContainer.appendChild(ground);
       }
     }
@@ -317,7 +311,7 @@ function moveAllEnemies() {
   }
 
   // Appeler moveAllEnemies à nouveau après un délai de 500 millisecondes
-  setTimeout(moveAllEnemies, 500);
+  setTimeout(moveAllEnemies, 2000);
 }
 function checkCollision(player, enemy) {
   const playerRect = player.getBoundingClientRect();
@@ -373,9 +367,10 @@ function placeBomb() {
   // Ajouter l'élément au conteneur du jeu
   gameContainer.appendChild(bomb);
 
-  // Lancer la minuterie de l'explosion de la bombe après 2 secondes
-  setTimeout(explodeBomb, 2000);
+  // Lancer la minuterie de l'explosion de la bombe après 1,5 seconde
+  setTimeout(explodeBomb, 1500);
 }
+
 function explodeBomb() {
   const bombX = Math.floor(bomb.offsetLeft / cellSize);
   const bombY = Math.floor(bomb.offsetTop / cellSize);
@@ -384,7 +379,39 @@ function explodeBomb() {
   bomb.remove();
   bomb = null;
 
-  // Supprimer les ennemis à proximité de l'explosion
+  const positions = [
+    { row: bombY - 1, col: bombX }, // Case au-dessus
+    { row: bombY + 1, col: bombX }, // Case en dessous
+    { row: bombY, col: bombX - 1 }, // Case à gauche
+    { row: bombY, col: bombX + 1 }  // Case à droite
+  ];
+
+  positions.forEach(position => {
+    const { row, col } = position;
+    if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
+      const cellValue = gameMap[row][col];
+      if (cellValue === 1) {
+        // Supprimer le mur destructible du DOM
+        const wall = document.querySelector(`.wall[data-row="${row}"][data-col="${col}"]`);
+        if (wall) {
+          wall.remove();
+        }
+
+        // Remplacer le mur destructible par une case "ground" dans le tableau gameMap
+        gameMap[row][col] = 0;
+
+        // Créer un élément div pour représenter la case "ground"
+        const ground = document.createElement("div");
+        ground.classList.add("ground");
+        ground.style.width = cellSize + "px";
+        ground.style.height = cellSize + "px";
+        ground.style.left = col * cellSize + "px";
+        ground.style.top = row * cellSize + "px";
+        gameContainer.appendChild(ground);
+      }
+    }
+  });
+
   for (let i = 0; i < enemyList.length; i++) {
     const enemy = enemyList[i];
     const enemyX = enemy.enemyX;
@@ -408,6 +435,9 @@ function explodeBomb() {
     }
   }
 }
+
+
+
 
 
 
