@@ -212,7 +212,7 @@ function generateRandomEnemyPosition() {
 
 
 // Création des ennemis
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 3; i++) {
   let enemy = document.createElement("div");
   enemy.id = "enemy" + String(i);
 
@@ -326,7 +326,8 @@ function checkCollision(player, enemy) {
     // Collision détectée, le joueur est touché par un ennemi
 
     // Mettez ici la logique pour la défaite du joueur, par exemple :
-    alert("Vous avez perdu !");
+    alert("Perdu ! Recommencer...");
+      document.location.reload(true);
     
     // Réinitialiser la position du joueur
     player.style.left = "3.3%";
@@ -391,23 +392,21 @@ function explodeBomb() {
     if (row >= 0 && row < gridSize && col >= 0 && col < gridSize) {
       const cellValue = gameMap[row][col];
       if (cellValue === 1) {
-        // Supprimer le mur destructible du DOM
         const wall = document.querySelector(`.wall[data-row="${row}"][data-col="${col}"]`);
-        if (wall) {
+        if (wall && !wall.classList.contains("indestructible-wall")) {
           wall.remove();
+          gameMap[row][col] = 0;
+          const ground = document.createElement("div");
+          ground.classList.add("ground");
+          ground.style.width = cellSize + "px";
+          ground.style.height = cellSize + "px";
+          ground.style.left = col * cellSize + "px";
+          ground.style.top = row * cellSize + "px";
+          gameContainer.appendChild(ground);
         }
-
-        // Remplacer le mur destructible par une case "ground" dans le tableau gameMap
-        gameMap[row][col] = 0;
-
-        // Créer un élément div pour représenter la case "ground"
-        const ground = document.createElement("div");
-        ground.classList.add("ground");
-        ground.style.width = cellSize + "px";
-        ground.style.height = cellSize + "px";
-        ground.style.left = col * cellSize + "px";
-        ground.style.top = row * cellSize + "px";
-        gameContainer.appendChild(ground);
+      } else if (cellValue === 2) {
+        // Murs indestructibles, ignorez l'explosion
+        return;
       }
     }
   });
@@ -434,6 +433,12 @@ function explodeBomb() {
       i--;
     }
   }
+ // Vérifier si c'est le dernier ennemi
+ if (enemyList.length === 0) {
+  alert("Gagné ! Score: ");
+  document.location.reload(true);
+  return;
+}
 }
 
 
