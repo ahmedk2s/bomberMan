@@ -87,17 +87,14 @@ function drawGameMap() {
         wall.style.height = cellSize + "px";
         wall.style.left = cellX + "px";
         wall.style.top = cellY + "px";
-
         gameContainer.appendChild(wall);
       } else {
         const ground = document.createElement("div");
         ground.classList.add("ground");
-
         ground.style.width = cellSize + "px";
         ground.style.height = cellSize + "px";
         ground.style.left = cellX + "px";
         ground.style.top = cellY + "px";
-
         gameContainer.appendChild(ground);
       }
     }
@@ -192,6 +189,7 @@ document.addEventListener("keydown", function (event) {
   player.style.left = newPositionX + "px";
   player.style.top = newPositionY + "px";
 });
+
 
 //-------------------------- CREATION DES MECHANTS--------------------------
 
@@ -325,7 +323,7 @@ function checkCollision(player, enemy) {
   ) {
     // Collision détectée, le joueur est touché par un ennemi
 
-    // Mettez ici la logique pour la défaite du joueur, par exemple :
+    // Ici la logique pour la défaite du joueur
     alert("Perdu ! Recommencer...");
       document.location.reload(true);
     
@@ -376,16 +374,16 @@ function explodeBomb() {
   const bombX = Math.floor(bomb.offsetLeft / cellSize);
   const bombY = Math.floor(bomb.offsetTop / cellSize);
 
-  // Supprimer la bombe du DOM
-  bomb.remove();
-  bomb = null;
-
   const positions = [
     { row: bombY - 1, col: bombX }, // Case au-dessus
     { row: bombY + 1, col: bombX }, // Case en dessous
     { row: bombY, col: bombX - 1 }, // Case à gauche
     { row: bombY, col: bombX + 1 }  // Case à droite
   ];
+
+  // Supprimer la bombe du DOM
+  bomb.remove();
+  bomb = null;
 
   positions.forEach(position => {
     const { row, col } = position;
@@ -404,12 +402,11 @@ function explodeBomb() {
           ground.style.top = row * cellSize + "px";
           gameContainer.appendChild(ground);
         }
-      } else if (cellValue === 2) {
-        // Murs indestructibles, ignorez l'explosion
-        return;
       }
     }
   });
+
+
 
   for (let i = 0; i < enemyList.length; i++) {
     const enemy = enemyList[i];
@@ -435,7 +432,7 @@ function explodeBomb() {
   }
  // Vérifier si c'est le dernier ennemi
  if (enemyList.length === 0) {
-  alert("Gagné ! Score: ");
+  alert("Gagné !");
   document.location.reload(true);
   return;
 }
